@@ -1,29 +1,25 @@
 """
 A script to train a machine learning model on ClimateNet
 """
+from argparse import ArgumentParser
+
 import numpy as np
 import pandas as pd
 import torch
-from sklearn.linear_model import LogisticRegression, Lasso
 from sklearn.dummy import DummyClassifier
+from sklearn.linear_model import Lasso, LogisticRegression
 from sklearn.model_selection import train_test_split
-from argparse import ArgumentParser
 
 
 def add_args(parser):
     """Add arguments to parser."""
     parser.add_argument("--train", default="data/train.csv", type=str, help="Train CSV")
-    parser.add_argument(
-        "--test",
-        default="data/test.csv",
-        type=str,
-        help="Test CSV"
-    )
+    parser.add_argument("--test", default="data/test.csv", type=str, help="Test CSV")
     parser.add_argument(
         "--pct_val",
         default=0.0,
         type=float,
-        help="Percentage of the train set for the validation set."
+        help="Percentage of the train set for the validation set.",
     )
     parser.add_argument(
         "--pct_test",
@@ -68,8 +64,8 @@ def add_args(parser):
 
 
 def read_data(train_path, test_path, cols_exclude=["lat", "lon", "time", "LABELS"]):
-    df_tr = pd.read_csv(train_path,index_col=0)
-    df_tt = pd.read_csv(test_path,index_col=0)
+    df_tr = pd.read_csv(train_path, index_col=0)
+    df_tt = pd.read_csv(test_path, index_col=0)
     features = [f for f in df_tr.keys() if f not in cols_exclude]
     x_tr = df_tr[features].values
     x_tt = df_tt[features].values
@@ -116,7 +112,9 @@ def logistic_regression_train(x_tr, y_tr, n_iters=500, do_balanced=False, seed=0
         class_weight = "balanced"
     else:
         class_weight = None
-    return LogisticRegression(max_iter=n_iters, class_weight=class_weight, random_state=seed).fit(x_tr, y_tr)
+    return LogisticRegression(
+        max_iter=n_iters, class_weight=class_weight, random_state=seed
+    ).fit(x_tr, y_tr)
 
 
 def logistic_regression_validate_reg_train(
@@ -197,8 +195,7 @@ def main(args):
         )
 
     # evaluation
-    baseline_acc_tr = evaluate_accuracy(baseline,
-        x_tr, y_tr)
+    baseline_acc_tr = evaluate_accuracy(baseline, x_tr, y_tr)
     baseline_acc_tt = evaluate_accuracy(baseline, x_tt, y_tt)
     logreg_acc_tt = evaluate_accuracy(logreg, x_tt, y_tt)
     logreg_acc_tr = evaluate_accuracy(logreg, x_tr, y_tr)
