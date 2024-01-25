@@ -11,9 +11,7 @@ from sklearn.model_selection import train_test_split
 
 
 def add_args(parser):
-    """
-    Add arguments to parser
-    """
+    """Add arguments to parser."""
     parser.add_argument(
         "--train",
         default="data/train.csv",
@@ -123,9 +121,9 @@ def logistic_regression_train(x_tr, y_tr, n_iters=500, do_balanced=False, seed=0
         class_weight = "balanced"
     else:
         class_weight = None
-    return LogisticRegression(
-        max_iter=n_iters, class_weight=class_weight, random_state=seed
-    ).fit(x_tr, y_tr)
+    return LogisticRegression(max_iter=n_iters, class_weight=class_weight, random_state=seed).fit(
+        x_tr, y_tr
+    )
 
 
 def logistic_regression_validate_reg_train(
@@ -155,7 +153,7 @@ def evaluate_accuracy(model, x, y):
 
 
 def main(args):
-    # Read data
+    # read data
     if not args.train:
         print("Train data file missing. Training will not proceed.")
         return
@@ -164,9 +162,9 @@ def main(args):
         return
     x_tr, x_tt_orig, y_tr, y_tt_orig = read_data(args.train, args.test)
     if args.do_print:
-        print(f"Number of features: {x_tr.shape[1]}")
-        print(f"Number of classes: {np.unique(y_tr).shape[0]}")
-    # Split
+        print(f"number of features: {x_tr.shape[1]}")
+        print(f"number of classes: {np.unique(y_tr).shape[0]}")
+    # split
     x_tr, x_val, x_tt, y_tr, y_val, y_tt = split(
         x_tr, y_tr, args.pct_val, args.pct_test, seed=args.seed
     )
@@ -174,15 +172,15 @@ def main(args):
         x_tt = x_tt_orig
         y_tt = y_tt_orig
     if args.do_print:
-        print(f"Train size: {len(x_tr)}")
-        print(f"Validation size: {len(x_val)}")
-        print(f"Test size: {len(x_tt)}")
+        print(f"train size: {len(x_tr)}")
+        print(f"validation size: {len(x_val)}")
+        print(f"test size: {len(x_tt)}")
 
-    # Normalize
+    # normalize
     if args.do_normalize:
         x_tr, x_val, x_tt = normalize(x_tr, x_val, x_tt)
 
-    # Train models
+    # train models
     baseline = most_frequent_train(x_tr, y_tr)
     if args.do_hp_validation and len(x_val) > 0:
         c_values = 10.0 ** np.arange(-2, 3)
@@ -205,15 +203,15 @@ def main(args):
             seed=args.seed,
         )
 
-    # Evaluation
+    # evaluation
     baseline_acc_tr = evaluate_accuracy(baseline, x_tr, y_tr)
     baseline_acc_tt = evaluate_accuracy(baseline, x_tt, y_tt)
     logreg_acc_tt = evaluate_accuracy(logreg, x_tt, y_tt)
     logreg_acc_tr = evaluate_accuracy(logreg, x_tr, y_tr)
-    print("Baseline - Train accuracy: {:.4f}".format(baseline_acc_tr))
-    print("Baseline - Test accuracy: {:.4f}".format(baseline_acc_tt))
-    print("LogReg - Train accuracy: {:.4f}".format(logreg_acc_tr))
-    print("LogReg - Test accuracy: {:.4f}".format(logreg_acc_tt))
+    print("baseline - train accuracy: {:.4f}".format(baseline_acc_tr))
+    print("baseline - test accuracy: {:.4f}".format(baseline_acc_tt))
+    print("logreg - train accuracy: {:.4f}".format(logreg_acc_tr))
+    print("logreg - test accuracy: {:.4f}".format(logreg_acc_tt))
 
 
 if __name__ == "__main__":
